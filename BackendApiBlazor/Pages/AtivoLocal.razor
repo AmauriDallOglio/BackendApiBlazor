@@ -4,43 +4,57 @@
 @using System.Net.Http;
 
 <html>
-<PageTitle>Empresas</PageTitle>
-<h1>Empresas</h1>
-<p>Listagem das empresas</p>
+    <PageTitle>AtivoLocal</PageTitle>
+    <h1>Empresas</h1>
+    <p>Listagem dos AtivoLocal</p>
 
-<body>
-    <form>
-        <div class="form-row">
-        </div>
-    </form>
-</body>
+    <body>
+        <form>
+            <div class="form-row">
+                @if (listaDeEmpresas == null)
+                {
+                    <p><em>Sem informação...</em></p>
+                }
+                else
+                {
+                     <div class="form-row">
+                        <button type="submit" class="btn btn-outline-success" onclick="@(async () => await Adicionar())" style="width:220px;">Adicionar</button>
+                    </div>
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Id</th>
+                                <th scope="col">Tenant</th>
+                                <th scope="col">Referência</th>
+                                <th scope="col">Descrição</th>
+                                <th scope="col">Inativo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var linha in listaDeEmpresas)
+                            {
+                                <tr>
+                                    <td>@linha.Id</td>
+                                    <td>@linha.Id_Tenant</td>
+                                    <td>@linha.Referencia</td>
+                                    <td>@linha.Descricao</td>
+                                    <td>@linha.Inativo</td>
+                                    <td>
+                                        <a button type="button" class="btn btn-outline-primary" asp-action="Adicionar" asp-route-id="@linha.Id">Edit</a> |
+                                        <a button type="button" class="btn btn-outline-info" asp-action="Alterar" asp-route-id="@linha.Id">Details</a> |
+                                        <a button type="button" class="btn btn-outline-danger" asp-action="Deletar" asp-route-id="@linha.Id">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </form>
+    </body>
 </html>
 
-@if (listaDeEmpresas == null)
-{
-    <p><em>Aguarde...</em></p>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">Descrição</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var linha in listaDeEmpresas)
-            {
-                <tr>
-                    <td>@linha.Descricao</td>
-                    <td>
-                        <!-- Outros elementos de ação aqui -->
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
 
 @code {
     private HttpClient Http = new HttpClient();
@@ -62,6 +76,15 @@ else
             // Lidar com erros de resposta da API aqui
             listaDeEmpresas = new List<EntidadeModelo.ListarTodos>();
         }
+    }
+
+    protected async Task Adicionar()
+    {
+        Tenant add = new Tenant()
+            {
+                Descricao = "Inserido em: " + DateTime.Now.ToString()
+            };
+        await Http.PostAsJsonAsync("/api/Empresas/Incluir", add);
     }
 }
 

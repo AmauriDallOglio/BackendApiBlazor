@@ -1,0 +1,239 @@
+﻿@page "/Tenant"
+@using BackendApiBlazor.Data
+@using Newtonsoft.Json
+@using System.Net.Http
+@inject IJSRuntime JSRuntime
+
+<html>
+<PageTitle>Tenant</PageTitle>
+<h1>Empresas</h1>
+<h2>Listagem dos Tenants</h2>
+
+<body>
+    <form>
+        @if (!string.IsNullOrEmpty(erro))
+        {
+            <div id="erroDiv" class="alert alert-danger" role="alert">
+                <button type="button" @onclick="OcultarErro" class="btn btn-danger btn-sm close-alert" aria-label="Close">x</button>
+                <p>Ocorreu um erro: @erro</p>
+            </div>
+        }
+
+@*         <div class="form-row">
+            <button class="btn btn-primary" @onclick="ChamarJavaScript">Chamar JavaScript</button>
+
+            <div id="elementoParaManipular" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;">
+                Este é um elemento que pode ser manipulado pelo JavaScript.
+            </div>
+        </div> *@
+
+ 
+        <div id="carregando" class="carregando" style="display: @(exibindoCarregando ? "block" : "none")">
+            Carregando...
+        </div>
+
+    @*     <div id="carregando" class="carregando">
+            Carregando...
+        </div> *@
+
+        <div class="form-row">
+            @if (listaDeEmpresas != null)
+            {
+                <div class="form-row">
+                    <button type="submit" class="btn btn-outline-success" onclick="@(async () => await Adicionar())" style="width:220px;">Adicionar</button>
+                </div>
+
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Id</th>
+                    
+                            <th scope="col">Referência</th>
+                            <th scope="col">Descrição</th>
+                            <th scope="col">Inativo</th>
+                            <th scope="col">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (listaDeEmpresas.Any())
+                        {
+                            @foreach (var linha in listaDeEmpresas)
+                            {
+                                <tr>
+                                    <td>@linha.Id</td>
+                        
+                                    <td>@linha.Referencia</td>
+                                    <td>@linha.Descricao</td>
+                                    <td>@linha.Inativo</td>
+                                    <td>
+                                        <a button type="button" class="btn btn-outline-primary" asp-action="Adicionar" asp-route-id="@linha.Id">Edit</a> |
+                                        <a button type="button" class="btn btn-outline-info" asp-action="Alterar" asp-route-id="@linha.Id">Details</a> |
+                                        <a button type="button" class="btn btn-outline-danger" asp-action="Deletar" asp-route-id="@linha.Id">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6"><em>Sem informações...</em></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </form>
+</body>
+</html>
+
+ 
+
+@code {
+    private HttpClient Http = new HttpClient();
+    private List<TenantModel> listaDeEmpresas;
+    private string erro;
+    private bool exibindoCarregando = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        exibindoCarregando = true;
+
+        await CarregarDados();
+        if (listaDeEmpresas == null)
+        {
+            listaDeEmpresas = GetExemploDeTenants();
+        }
+        exibindoCarregando = false;
+    }
+
+
+
+
+
+    private async Task CarregarDados()
+    {
+        try
+        {
+            string pesquisa = ""; // Sua lógica de pesquisa aqui
+            string apiUrl = $"https://localhost:7076/api/v1/Tenant/ListarTodos?Descricao={pesquisa}";
+            HttpResponseMessage response = await Http.GetAsync(apiUrl);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                listaDeEmpresas = JsonConvert.DeserializeObject<List<TenantModel>>(content);
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                erro = "Erro 401: Não autorizado. Por favor, faça login ou verifique suas credenciais.";
+            }
+            else
+            {
+                erro = "Erro ao carregar os ativos locais: " + response.ReasonPhrase;
+            }
+            // await JSRuntime.InvokeVoidAsync("OcultarFraseCarregando");
+        }
+        catch (Exception ex)
+        {
+            erro = "Erro ao carregar os ativos locais: " + ex.Message;
+            // await JSRuntime.InvokeVoidAsync("OcultarFraseCarregando");
+        }
+    }
+
+
+
+
+    private async Task Adicionar()
+    {
+        try
+        {
+            TenantModel tenant = new TenantModel();
+            HttpResponseMessage response = await Http.PostAsJsonAsync("/api/Empresas/Incluir", tenant);
+
+            if (response.IsSuccessStatusCode)
+            {
+               
+                await CarregarDados(); 
+            }
+            else
+            {
+                erro = "Erro ao adicionar o item: " + response.ReasonPhrase;
+            }
+        }
+        catch (Exception ex)
+        {
+            erro = "Erro ao adicionar o item: " + ex.Message;
+        }
+    }
+
+
+
+    private List<TenantModel> GetExemploDeTenants()
+    {
+        return new List<TenantModel>
+        {
+            new TenantModel
+            {
+                Id = Guid.NewGuid(),
+                Referencia = "Ten001",
+                Descricao = "Tenant exemplo 1",
+                Inativo = false,
+                Id_Imagem = Guid.NewGuid()
+            },
+            new TenantModel
+            {
+                Id = Guid.NewGuid(),
+                Referencia = "Ten002",
+                Descricao = "Tenant exemplo 2",
+                Inativo = true,
+                Id_Imagem = Guid.NewGuid()
+            },
+            new TenantModel
+            {
+                Id = Guid.NewGuid(),
+                Referencia = "Ten003",
+                Descricao = "Tenant exemplo 3",
+                Inativo = false,
+                Id_Imagem = null
+            }
+        };
+    }
+
+    // private async Task ChamarJavaScript()
+    // {
+    //     await JSRuntime.InvokeVoidAsync("AlterarEstiloElemento", "elementoParaManipular");
+ 
+    // }
+
+    private async Task OcultarErro()
+    {
+        erro = null;
+    }
+
+
+}
+
+<script>
+    // window.AlterarEstiloElemento = function (elementId) {
+    //     var elemento = document.getElementById(elementId);
+    //     elemento.style.backgroundColor = "lightblue";
+    //     elemento.style.border = "2px dashed blue";
+    //     elemento.style.fontSize = "18px";
+    // }
+
+    window.OcultarErro = function () {
+        document.getElementById('erroDiv').style.display = 'none';
+    };
+
+    // window.OcultarFraseCarregando = function() {
+    // var elemento = document.getElementById('carregando');
+    // if (elemento !== null) {
+    //     elemento.style.display = 'none'; // Define o estilo de display para ocultar o elemento
+    // }
+};
+
+</script>
+
+
+ 

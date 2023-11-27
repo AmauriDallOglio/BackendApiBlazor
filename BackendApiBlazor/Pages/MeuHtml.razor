@@ -1,0 +1,109 @@
+﻿@page "/meuHtml"
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Página Blazor</title>
+    <style>
+        /* Estilos simples para visualização */
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #444;
+            color: white;
+            padding: 10px;
+        }
+
+        aside {
+            float: left;
+            width: 25%;
+            background-color: #ddd;
+            padding: 10px;
+        }
+
+        main {
+            float: left;
+            width: 75%;
+            padding: 20px;
+        }
+
+        article {
+            margin-bottom: 20px;
+        }
+
+        figure {
+            margin: 0;
+            padding: 0;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        section {
+            margin-bottom: 20px;
+        }
+
+        footer {
+            clear: both;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Meu Site Blazor</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#">Link 1</a></li>
+            <li><a href="#">Link 2</a></li>
+            <li><a href="#">Link 3</a></li>
+        </ul>
+    </nav>
+
+    <aside>
+        <h2>Barra Lateral</h2>
+        <p>Conteúdo da barra lateral...</p>
+    </aside>
+
+    <main>
+        <section>
+            <h2>Seção 1</h2>
+            <article>
+                <figure>
+                    <img src="https://via.placeholder.com/150" alt="Imagem de Exemplo">
+                    <figcaption>Legenda da Imagem</figcaption>
+                </figure>
+                <p>Conteúdo do artigo da Seção 1...</p>
+            </article>
+        </section>
+
+        <section>
+            <h2>Seção 2</h2>
+            <article>
+                <figure>
+                    <img src="https://via.placeholder.com/150" alt="Imagem de Exemplo">
+                    <figcaption>Legenda da Imagem</figcaption>
+                </figure>
+                <p>Conteúdo do artigo da Seção 2...</p>
+            </article>
+        </section>
+    </main>
+
+    <footer>
+        <p>Rodapé da Página &copy; @DateTime.Now.Year</p>
+    </footer>
+</body>
+</html>

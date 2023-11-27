@@ -1,6 +1,6 @@
 ﻿namespace BackendApiBlazor.Data
 {
-    public class Tenant
+    public class TenantModel
     {
         public Guid Id { get; set; }
         public string Referencia { get; set; } = string.Empty;

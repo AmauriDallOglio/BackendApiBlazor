@@ -1,92 +1,72 @@
 ﻿@page "/AtivoLocal"
-@using BackendApiBlazor.Data;
-@using Newtonsoft.Json;
-@using System.Net.Http;
+@using BackendApiBlazor.Data
+@using System.Text.Json
 
-<html>
-    <PageTitle>AtivoLocal</PageTitle>
-    <h1>Empresas</h1>
-    <p>Listagem dos AtivoLocal</p>
+<h1>Lista de Ativos Locais</h1>
 
-    <body>
-        <form>
-            <div class="form-row">
-                @if (listaDeEmpresas == null)
-                {
-                    <p><em>Sem informação...</em></p>
-                }
-                else
-                {
-                     <div class="form-row">
-                        <button type="submit" class="btn btn-outline-success" onclick="@(async () => await Adicionar())" style="width:220px;">Adicionar</button>
-                    </div>
-
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col">Id</th>
-                                <th scope="col">Tenant</th>
-                                <th scope="col">Referência</th>
-                                <th scope="col">Descrição</th>
-                                <th scope="col">Inativo</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var linha in listaDeEmpresas)
-                            {
-                                <tr>
-                                    <td>@linha.Id</td>
-                                    <td>@linha.Id_Tenant</td>
-                                    <td>@linha.Referencia</td>
-                                    <td>@linha.Descricao</td>
-                                    <td>@linha.Inativo</td>
-                                    <td>
-                                        <a button type="button" class="btn btn-outline-primary" asp-action="Adicionar" asp-route-id="@linha.Id">Edit</a> |
-                                        <a button type="button" class="btn btn-outline-info" asp-action="Alterar" asp-route-id="@linha.Id">Details</a> |
-                                        <a button type="button" class="btn btn-outline-danger" asp-action="Deletar" asp-route-id="@linha.Id">Delete</a>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-            </div>
-        </form>
-    </body>
-</html>
-
+@if (ativosLocais == null)
+{
+    <p><em>Sem informações...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Referência</th>
+                <th>Área</th>
+                <th>Setor</th>
+                <th>Descrição</th>
+                <th>Inativo</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ativo in ativosLocais)
+            {
+                <tr>
+                    <td>@ativo.Referencia</td>
+                    <td>@ativo.Area</td>
+                    <td>@ativo.Setor</td>
+                    <td>@ativo.Descricao</td>
+                    <td>@ativo.Inativo</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @code {
-    private HttpClient Http = new HttpClient();
-    private List<EntidadeModelo.ListarTodos> listaDeEmpresas;
+    private List<AtivoLocalModel> ativosLocais;
 
     protected override async Task OnInitializedAsync()
     {
-        string pesquisa = "";
-        string apiUrl = $"https://localhost:7076/api/v1/AtivoLocal/ListarTodos?Descricao={pesquisa}";
-        HttpResponseMessage response = await Http.GetAsync(apiUrl);
-
-        if (response.IsSuccessStatusCode)
+        ativosLocais = new List<AtivoLocalModel>
         {
-            var content = await response.Content.ReadAsStringAsync();
-            listaDeEmpresas = JsonConvert.DeserializeObject<List<EntidadeModelo.ListarTodos>>(content);
-        }
-        else
-        {
-            // Lidar com erros de resposta da API aqui
-            listaDeEmpresas = new List<EntidadeModelo.ListarTodos>();
-        }
-    }
-
-    protected async Task Adicionar()
-    {
-        Tenant add = new Tenant()
+            new AtivoLocalModel
             {
-                Descricao = "Inserido em: " + DateTime.Now.ToString()
-            };
-        await Http.PostAsJsonAsync("/api/Empresas/Incluir", add);
+                Referencia = "REF001",
+                Area = "Área A",
+                Setor = "Setor 1",
+                Descricao = "Descrição do Ativo 1",
+                Inativo = false
+            },
+            new AtivoLocalModel
+            {
+                Referencia = "REF002",
+                Area = "Área B",
+                Setor = "Setor 2",
+                Descricao = "Descrição do Ativo 2",
+                Inativo = true
+            },
+            new AtivoLocalModel
+            {
+                Referencia = "REF003",
+                Area = "Área C",
+                Setor = "Setor 3",
+                Descricao = "Descrição do Ativo 3",
+                Inativo = false
+            }
+        };
     }
 }
-
-
  
